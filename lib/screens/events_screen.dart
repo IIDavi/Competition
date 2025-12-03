@@ -25,6 +25,19 @@ class _EventsScreenState extends State<EventsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('JudgeRules (v2)'),
+        actions: [
+          Consumer<AppProvider>(
+            builder: (context, provider, child) {
+              return IconButton(
+                icon: Icon(provider.isDarkMode ? Icons.light_mode : Icons.dark_mode),
+                tooltip: provider.isDarkMode ? 'Light Mode' : 'Dark Mode',
+                onPressed: () {
+                  provider.toggleTheme();
+                },
+              );
+            },
+          ),
+        ],
       ),
       body: Consumer<AppProvider>(
         builder: (context, provider, child) {
