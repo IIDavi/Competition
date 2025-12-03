@@ -115,14 +115,19 @@ class _EventsScreenState extends State<EventsScreen> {
             );
           }
 
-          return ListView.builder(
+          return GridView.builder(
             padding: const EdgeInsets.all(8),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              childAspectRatio: 1.0,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
             itemCount: provider.events.length,
             itemBuilder: (context, index) {
               final event = provider.events[index];
               return Card(
                 elevation: 4,
-                margin: const EdgeInsets.only(bottom: 16),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onTap: () {
@@ -132,107 +137,86 @@ class _EventsScreenState extends State<EventsScreen> {
                       MaterialPageRoute(builder: (context) => const TimelineScreen()),
                     );
                   },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      // Banner Image
+                      // Background Image
                       if (event.imgURL.isNotEmpty)
-                        SizedBox(
-                          height: 140,
-                          width: double.infinity,
-                          child: Image.network(
-                            event.imgURL,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => Container(
-                              color: Colors.grey[200],
-                              child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
+                        Image.network(
+                          event.imgURL,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Container(
+                            color: Colors.grey[200],
+                            child: const Icon(Icons.image_not_supported, color: Colors.grey),
+                          ),
+                        )
+                      else
+                        Container(color: Colors.grey[200]),
+                      
+                      // Gradient Overlay for readability
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter,
+                              colors: [
+                                Colors.black.withOpacity(0.8),
+                                Colors.transparent,
+                              ],
                             ),
                           ),
-                        ),
-                        
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Title
-                            Text(
-                              event.name,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                event.name,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            
-                            // Date and Location
-                            Row(
-                              children: [
-                                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
-                                const SizedBox(width: 4),
-                                Text(event.date, style: TextStyle(color: Colors.grey[700])),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Row(
-                              children: [
-                                const Icon(Icons.location_on, size: 16, color: Colors.grey),
-                                const SizedBox(width: 4),
-                                Expanded(
-                                  child: Text(
-                                    '${event.locationCity ?? "Unknown"}, ${event.locationRegion ?? ""}',
-                                    style: TextStyle(color: Colors.grey[700]),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                              const SizedBox(height: 4),
+                              Text(
+                                event.date,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 10,
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      
+                      // Type Badge (top right)
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withOpacity(0.6),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            event.type.toUpperCase(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
                             ),
-                            
-                            const Divider(height: 24),
-                            
-                            // Details Grid
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                // Type
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue.withOpacity(0.1),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: Colors.blue.withOpacity(0.5)),
-                                  ),
-                                  child: Text(
-                                    event.type.toUpperCase(),
-                                    style: const TextStyle(
-                                      color: Colors.blue,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                                // Enrollment Status
-                                Text(
-                                  'Ends in ${event.enrollmentEndDays} days',
-                                  style: TextStyle(
-                                    color: event.enrollmentEndDays < 7 ? Colors.red : Colors.green,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 8),
-                            // Subscriber Stats
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text('👥 Total: ${event.totalSubscribers}'),
-                                Text('👤 Ind: ${event.individualsSubscribed}'),
-                                Text('🛡️ Team: ${event.teamsSubscribed}'),
-                              ],
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ],
