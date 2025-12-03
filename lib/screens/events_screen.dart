@@ -19,6 +19,32 @@ class EventsScreen extends StatelessWidget {
           }
           
           if (provider.events.isEmpty) {
+            if (provider.errorMessage != null) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Error loading events:\n${provider.errorMessage}',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Colors.red),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          Provider.of<AppProvider>(context, listen: false).fetchEvents();
+                        },
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }
             return const Center(child: Text('No events found.'));
           }
 

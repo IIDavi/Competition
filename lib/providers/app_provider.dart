@@ -9,6 +9,7 @@ class AppProvider with ChangeNotifier {
   
   List<Event> _events = [];
   bool _isLoadingEvents = false;
+  String? _errorMessage;
   
   Event? _selectedEvent;
   List<TimelineItem> _timeline = [];
@@ -20,6 +21,7 @@ class AppProvider with ChangeNotifier {
   // Getters
   List<Event> get events => _events;
   bool get isLoadingEvents => _isLoadingEvents;
+  String? get errorMessage => _errorMessage;
   Event? get selectedEvent => _selectedEvent;
   List<TimelineItem> get timeline => _timeline;
   bool get isLoadingTimeline => _isLoadingTimeline;
@@ -63,11 +65,13 @@ class AppProvider with ChangeNotifier {
 
   Future<void> fetchEvents() async {
     _isLoadingEvents = true;
+    _errorMessage = null;
     notifyListeners();
     try {
       _events = await _apiService.fetchEvents();
     } catch (e) {
-      print(e);
+      print('Error fetching events: $e');
+      _errorMessage = e.toString();
       _events = [];
     } finally {
       _isLoadingEvents = false;
