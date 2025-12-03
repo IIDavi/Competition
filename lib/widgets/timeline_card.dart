@@ -12,6 +12,31 @@ class TimelineCard extends StatelessWidget {
     this.isHighlight = false,
   });
 
+  Color _getCategoryColor(String category) {
+    if (category.isEmpty) return Colors.grey;
+    final hash = category.hashCode;
+    final colors = [
+      Colors.red.shade100, Colors.green.shade100, Colors.blue.shade100, 
+      Colors.orange.shade100, Colors.purple.shade100, Colors.teal.shade100, 
+      Colors.pink.shade100, Colors.indigo.shade100, Colors.brown.shade100, 
+      Colors.cyan.shade100, Colors.lime.shade100, Colors.amber.shade100
+    ];
+    // Return a lighter shade for background, maybe use darker for text
+    return colors[hash.abs() % colors.length];
+  }
+  
+  Color _getCategoryTextColor(String category) {
+     if (category.isEmpty) return Colors.black54;
+    final hash = category.hashCode;
+    final colors = [
+      Colors.red.shade900, Colors.green.shade900, Colors.blue.shade900, 
+      Colors.orange.shade900, Colors.purple.shade900, Colors.teal.shade900, 
+      Colors.pink.shade900, Colors.indigo.shade900, Colors.brown.shade900, 
+      Colors.cyan.shade900, Colors.lime.shade900, Colors.amber.shade900
+    ];
+    return colors[hash.abs() % colors.length];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -30,7 +55,7 @@ class TimelineCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Participants - ${item.teamName}',
+                    'Partecipanti - ${item.teamName}',
                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const Divider(),
@@ -51,7 +76,7 @@ class TimelineCard extends StatelessWidget {
                   else
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Text('No participants information available.'),
+                      child: Text('Nessuna informazione sui partecipanti disponibile.'),
                     ),
                   const SizedBox(height: 10),
                 ],
@@ -84,10 +109,10 @@ class TimelineCard extends StatelessWidget {
                           // For prototype: show confirmation.
                           NotificationService().showNotification(
                             'Alert Set', 
-                            'You will be notified before ${item.teamName} starts at ${item.startingTime}'
+                            'Sarai avvisato prima che ${item.teamName} inizi alle ${item.startingTime}'
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
-                             const SnackBar(content: Text('Alert scheduled (demo mode)')),
+                             const SnackBar(content: Text('Notifica programmata (demo)')),
                           );
                         },
                       ),
@@ -96,6 +121,26 @@ class TimelineCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 4),
+              // Category Badge
+              if (item.category.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: _getCategoryColor(item.category),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      item.category,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: _getCategoryTextColor(item.category),
+                      ),
+                    ),
+                  ),
+                ),
               Text(
                 item.teamName,
                 style: TextStyle(
