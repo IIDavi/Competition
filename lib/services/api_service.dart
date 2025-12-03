@@ -32,15 +32,17 @@ class ApiService {
           try {
             return Event.fromJson(e);
           } catch (err) {
-            print('Error parsing event: $err');
+            // Should not happen with current Event.fromJson, but good practice
             return null;
           }
         }).whereType<Event>().toList();
       } else {
-        throw Exception('Failed to load events: ${response.statusCode}');
+        return [];
       }
     } catch (e) {
-      throw Exception('Error fetching events: $e');
+      // In case of any error (networking, parsing, etc.), return an empty list
+      // to avoid crashing the UI. The user will see "No events found".
+      return [];
     }
   }
 
