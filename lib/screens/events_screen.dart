@@ -3,72 +3,14 @@ import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import 'timeline_screen.dart';
 
-class EventsScreen extends StatefulWidget {
+class EventsScreen extends StatelessWidget {
   const EventsScreen({super.key});
-
-  @override
-  State<EventsScreen> createState() => _EventsScreenState();
-}
-
-class _EventsScreenState extends State<EventsScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-  bool _isSearching = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController.addListener(() {
-      setState(() {
-        _searchQuery = _searchController.text.toLowerCase();
-      });
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<AppProvider>(context, listen: false).fetchEvents();
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        title: _isSearching
-            ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  hintText: 'Search competition...',
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(color: Colors.white70),
-                ),
-                style: const TextStyle(color: Colors.white),
-                cursorColor: Colors.white,
-              )
-            : const Text('Home'),
-        actions: [
-          IconButton(
-            icon: Icon(_isSearching ? Icons.close : Icons.search),
-            onPressed: () {
-              setState(() {
-                if (_isSearching) {
-                  _isSearching = false;
-                  _searchController.clear();
-                  _searchQuery = '';
-                } else {
-                  _isSearching = true;
-                }
-              });
-            },
-          ),
-        ],
+        title: const Text('JudgeRules (v2)'),
       ),
       body: Consumer<AppProvider>(
         builder: (context, provider, child) {
@@ -136,50 +78,38 @@ class _EventsScreenState extends State<EventsScreen> {
             );
           }
 
-          final filteredEvents = provider.events.where((event) {
-            return event.name.toLowerCase().contains(_searchQuery) ||
-                   event.locationCity.toLowerCase().contains(_searchQuery);
-          }).toList();
-
-          if (filteredEvents.isEmpty) {
+          if (provider.events.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text(_searchQuery.isEmpty ? 'No events found.' : 'No matches found.'),
-                  if (_searchQuery.isEmpty) ...[
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                         final provider = Provider.of<AppProvider>(context, listen: false);
-                         provider.loadDemoEvent().then((_) {
-                           Navigator.push(
-                             context,
-                             MaterialPageRoute(builder: (context) => const TimelineScreen()),
-                           );
-                         });
-                      },
-                      child: const Text('Load South Throwdown (Demo)'),
-                    ),
-                  ],
+                  const Text('No events found.'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                       final provider = Provider.of<AppProvider>(context, listen: false);
+                       provider.loadDemoEvent().then((_) {
+                         Navigator.push(
+                           context,
+                           MaterialPageRoute(builder: (context) => const TimelineScreen()),
+                         );
+                       });
+                    },
+                    child: const Text('Load South Throwdown (Demo)'),
+                  ),
                 ],
               ),
             );
           }
 
-          return GridView.builder(
+          return ListView.builder(
             padding: const EdgeInsets.all(8),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 4,
-              childAspectRatio: 1.0,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 8,
-            ),
-            itemCount: filteredEvents.length,
+            itemCount: provider.events.length,
             itemBuilder: (context, index) {
-              final event = filteredEvents[index];
+              final event = provider.events[index];
               return Card(
                 elevation: 4,
+                margin: const EdgeInsets.only(bottom: 16),
                 clipBehavior: Clip.antiAlias,
                 child: InkWell(
                   onTap: () {
@@ -189,86 +119,107 @@ class _EventsScreenState extends State<EventsScreen> {
                       MaterialPageRoute(builder: (context) => const TimelineScreen()),
                     );
                   },
-                  child: Stack(
-                    fit: StackFit.expand,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Background Image
+                      // Banner Image
                       if (event.imgURL.isNotEmpty)
-                        Image.network(
-                          event.imgURL,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => Container(
-                            color: Colors.grey[200],
-                            child: const Icon(Icons.image_not_supported, color: Colors.grey),
-                          ),
-                        )
-                      else
-                        Container(color: Colors.grey[200]),
-                      
-                      // Gradient Overlay for readability
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(8.0),
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.bottomCenter,
-                              end: Alignment.topCenter,
-                              colors: [
-                                Colors.black.withOpacity(0.8),
-                                Colors.transparent,
-                              ],
+                        SizedBox(
+                          height: 140,
+                          width: double.infinity,
+                          child: Image.network(
+                            event.imgURL,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) => Container(
+                              color: Colors.grey[200],
+                              child: const Icon(Icons.image_not_supported, size: 50, color: Colors.grey),
                             ),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                event.name,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                event.date,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 10,
-                                ),
-                              ),
-                            ],
                           ),
                         ),
-                      ),
-                      
-                      // Type Badge (top right)
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.6),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            event.type.toUpperCase(),
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
+                        
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Title
+                            Text(
+                              event.name,
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
+                            const SizedBox(height: 8),
+                            
+                            // Date and Location
+                            Row(
+                              children: [
+                                const Icon(Icons.calendar_today, size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Text(event.date, style: TextStyle(color: Colors.grey[700])),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Row(
+                              children: [
+                                const Icon(Icons.location_on, size: 16, color: Colors.grey),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Text(
+                                    '${event.locationCity ?? "Unknown"}, ${event.locationRegion ?? ""}',
+                                    style: TextStyle(color: Colors.grey[700]),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            
+                            const Divider(height: 24),
+                            
+                            // Details Grid
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                // Type
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(12),
+                                    border: Border.all(color: Colors.blue.withOpacity(0.5)),
+                                  ),
+                                  child: Text(
+                                    event.type.toUpperCase(),
+                                    style: const TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                                // Enrollment Status
+                                Text(
+                                  'Ends in ${event.enrollmentEndDays} days',
+                                  style: TextStyle(
+                                    color: event.enrollmentEndDays < 7 ? Colors.red : Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            // Subscriber Stats
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('👥 Total: ${event.totalSubscribers}'),
+                                Text('👤 Ind: ${event.individualsSubscribed}'),
+                                Text('🛡️ Team: ${event.teamsSubscribed}'),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     ],
