@@ -47,7 +47,7 @@ class AppProvider with ChangeNotifier {
   AppProvider() {
     print('AppProvider initialized (Safe Mode)');
     _loadPreferences();
-    // fetchEvents(); // Removed: Triggered by UI to avoid build conflicts
+    fetchEvents();
   }
 
   Future<void> _loadPreferences() async {
