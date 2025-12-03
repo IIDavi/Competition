@@ -22,10 +22,27 @@ class TimelineItem {
   });
 
   factory TimelineItem.fromJson(Map<String, dynamic> json) {
-    final team = json['team'] ?? {};
+    final team = json['team'];
+    final athlete = json['athlete'];
+
+    String id = '';
+    String name = 'Unknown';
+
+    if (team != null) {
+      id = team['id']?.toString() ?? '';
+      name = team['name'] ?? 'Unknown Team';
+    } else if (athlete != null) {
+      // Fallback for individual events
+      id = athlete['id']?.toString() ?? '';
+      final firstName = athlete['firstName'] ?? '';
+      final lastName = athlete['lastName'] ?? '';
+      name = '$firstName $lastName'.trim();
+      if (name.isEmpty) name = 'Unknown Athlete';
+    }
+
     return TimelineItem(
-      teamId: team['id']?.toString() ?? '',
-      teamName: team['name'] ?? 'Unknown Team',
+      teamId: id,
+      teamName: name,
       workoutName: json['workoutName'] ?? '',
       heat: json['heat']?.toString() ?? '',
       lane: json['lane']?.toString() ?? '',
