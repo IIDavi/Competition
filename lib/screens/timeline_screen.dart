@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 import '../models/timeline_item.dart';
 import '../providers/app_provider.dart';
 import '../widgets/timeline_card.dart';
@@ -143,6 +144,30 @@ class _TimelineScreenState extends State<TimelineScreen> {
                   itemCount: currentList.length,
                   itemBuilder: (context, index) {
                     final item = currentList[index];
+                    bool showHeader = false;
+                    
+                    if (index == 0) {
+                      showHeader = true;
+                    } else {
+                      final prevItem = currentList[index - 1];
+                      if (item.date != prevItem.date) {
+                        showHeader = true;
+                      }
+                    }
+
+                    if (showHeader) {
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildDateHeader(item),
+                          TimelineCard(
+                            item: item, 
+                            isHighlight: provider.isFollowing(item.teamId),
+                          ),
+                        ],
+                      );
+                    }
+                    
                     return TimelineCard(
                       item: item, 
                       isHighlight: provider.isFollowing(item.teamId),
@@ -153,6 +178,40 @@ class _TimelineScreenState extends State<TimelineScreen> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildDateHeader(TimelineItem item) {
+    String dateText = item.date;
+    try {
+      final dt = item.startDateTime;
+      if (dt != null) {
+        // Example: "Sabato 6 Dicembre" (assuming Italian locale or default en)
+        // Note: initializeDateFormatting might be needed in main.dart depending on locale usage,
+        // but often standard patterns work. Let's stick to a safe simple format or English default if IT not loaded.
+        // We will try to format it nicely.
+        dateText = DateFormat('EEEE d MMMM yyyy').format(dt);
+      }
+    } catch (_) {}
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 16.0, bottom: 8.0, left: 8.0),
+      child: Row(
+        children: [
+          const Icon(Icons.calendar_today, size: 16, color: Colors.blueGrey),
+          const SizedBox(width: 8),
+          Text(
+            dateText,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.blueGrey,
+            ),
+          ),
+          const SizedBox(width: 8),
+          const Expanded(child: Divider(thickness: 1, color: Colors.blueGrey)),
+        ],
       ),
     );
   }
