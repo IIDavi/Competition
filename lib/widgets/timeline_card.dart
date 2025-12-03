@@ -92,9 +92,20 @@ class TimelineCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    item.startingTime,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        item.startingTime,
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '(Warmup: ${item.warmupTime})',
+                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                    ],
                   ),
                   Row(
                     children: [
@@ -155,8 +166,6 @@ class TimelineCard extends StatelessWidget {
                 item.workoutName,
                 style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
               ),
-              const SizedBox(height: 4),
-              Text('Warmup: ${item.warmupTime}', style: const TextStyle(fontSize: 12)),
             ],
           ),
         ),
