@@ -11,8 +11,19 @@ class ApiService {
     final uri = Uri.parse('$_baseUrl/events?limit=20&skip=0&list=1');
     try {
       final response = await http.get(uri, headers: {
-        'User-Agent': 'JudgeRulesApp/1.0',
-        'Accept': 'application/json',
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0',
+        'Accept': '*/*',
+        'Accept-Language': 'en_GB',
+        // 'Accept-Encoding': 'gzip, deflate, br, zstd', // Dart http client handles encoding automatically
+        'Referer': 'https://app.judgerules.it/',
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Origin': 'https://app.judgerules.it',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Site': 'same-site',
+        'Connection': 'keep-alive',
+        'Priority': 'u=0',
+        'TE': 'trailers',
       });
 
       if (response.statusCode == 200) {
