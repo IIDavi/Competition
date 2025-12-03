@@ -11,19 +11,62 @@ class EventsScreen extends StatefulWidget {
 }
 
 class _EventsScreenState extends State<EventsScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+  bool _isSearching = false;
+
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(() {
+      setState(() {
+        _searchQuery = _searchController.text.toLowerCase();
+      });
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<AppProvider>(context, listen: false).fetchEvents();
     });
   }
 
   @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Search competition...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Colors.white70),
+                ),
+                style: const TextStyle(color: Colors.white),
+                cursorColor: Colors.white,
+              )
+            : const Text('Home'),
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                if (_isSearching) {
+                  _isSearching = false;
+                  _searchController.clear();
+                  _searchQuery = '';
+                } else {
+                  _isSearching = true;
+                }
+              });
+            },
+          ),
+        ],
       ),
       body: Consumer<AppProvider>(
         builder: (context, provider, child) {
@@ -91,25 +134,32 @@ class _EventsScreenState extends State<EventsScreen> {
             );
           }
 
-          if (provider.events.isEmpty) {
+          final filteredEvents = provider.events.where((event) {
+            return event.name.toLowerCase().contains(_searchQuery) ||
+                   event.locationCity.toLowerCase().contains(_searchQuery);
+          }).toList();
+
+          if (filteredEvents.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('No events found.'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                       final provider = Provider.of<AppProvider>(context, listen: false);
-                       provider.loadDemoEvent().then((_) {
-                         Navigator.push(
-                           context,
-                           MaterialPageRoute(builder: (context) => const TimelineScreen()),
-                         );
-                       });
-                    },
-                    child: const Text('Load South Throwdown (Demo)'),
-                  ),
+                  Text(_searchQuery.isEmpty ? 'No events found.' : 'No matches found.'),
+                  if (_searchQuery.isEmpty) ...[
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                         final provider = Provider.of<AppProvider>(context, listen: false);
+                         provider.loadDemoEvent().then((_) {
+                           Navigator.push(
+                             context,
+                             MaterialPageRoute(builder: (context) => const TimelineScreen()),
+                           );
+                         });
+                      },
+                      child: const Text('Load South Throwdown (Demo)'),
+                    ),
+                  ],
                 ],
               ),
             );
@@ -123,9 +173,9 @@ class _EventsScreenState extends State<EventsScreen> {
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
             ),
-            itemCount: provider.events.length,
+            itemCount: filteredEvents.length,
             itemBuilder: (context, index) {
-              final event = provider.events[index];
+              final event = filteredEvents[index];
               return Card(
                 elevation: 4,
                 clipBehavior: Clip.antiAlias,
