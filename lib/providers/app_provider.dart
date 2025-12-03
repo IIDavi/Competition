@@ -105,7 +105,16 @@ class AppProvider with ChangeNotifier {
       name: 'South Throwdown',
       date: 'December 06/07 2025',
       locationCity: 'Napoli',
+      locationRegion: 'Campania',
       state: 50,
+      type: 'team',
+      totalSubscribers: 0,
+      individualsSubscribed: 0,
+      teamsSubscribed: 0,
+      enrollmentEndDate: '',
+      enrollmentEndDays: 0,
+      imgURL: '',
+      imgThumbnail: '',
     );
     await selectEvent(demoEvent);
   }

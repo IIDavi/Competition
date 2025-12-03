@@ -7,8 +7,8 @@ class ApiService {
   static const String _baseUrl = 'https://api.judgerules.it/api';
 
   Future<List<Event>> fetchEvents() async {
-    // Using the parameters discovered: limit=100, skip=0, list=1
-    final uri = Uri.parse('$_baseUrl/events?limit=100&skip=0&list=1');
+    // Using the parameters requested: limit=20, skip=0, list=1
+    final uri = Uri.parse('$_baseUrl/events?limit=20&skip=0&list=1');
     try {
       final response = await http.get(uri);
       if (response.statusCode == 200) {
