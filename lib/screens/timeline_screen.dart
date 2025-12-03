@@ -92,8 +92,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
             currentList = currentList.where((item) {
               final query = _searchQuery.toLowerCase();
               return item.teamName.toLowerCase().contains(query) ||
-                     item.participants.any((p) => p.toLowerCase().contains(query)) ||
-                     item.boxes.any((b) => b.toLowerCase().contains(query));
+                     item.participants.any((p) => p.toLowerCase().contains(query));
             }).toList();
           }
 
@@ -224,7 +223,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Cerca squadra, atleta o box...',
+          hintText: 'Cerca squadra o atleta...',
           prefixIcon: const Icon(Icons.search),
           filled: true,
           fillColor: Colors.grey.shade100,

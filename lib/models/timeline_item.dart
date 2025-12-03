@@ -9,7 +9,6 @@ class TimelineItem {
   final String category;
   final String date; // "06-12-2025"
   final List<String> participants;
-  final List<String> boxes;
 
   TimelineItem({
     required this.teamId,
@@ -22,7 +21,6 @@ class TimelineItem {
     required this.category,
     required this.date,
     required this.participants,
-    required this.boxes,
   });
 
   factory TimelineItem.fromJson(Map<String, dynamic> json) {
@@ -32,24 +30,6 @@ class TimelineItem {
     String id = '';
     String name = 'Unknown';
     List<String> parsedParticipants = [];
-    List<String> parsedBoxes = [];
-
-    void parseBox(dynamic boxData) {
-      if (boxData == null) return;
-      String? boxName;
-      if (boxData is String) {
-        boxName = boxData;
-      } else if (boxData is Map) {
-        boxName = boxData['name']?.toString();
-      }
-      
-      if (boxName != null) {
-        final cleanBox = boxName.trim();
-        if (cleanBox.isNotEmpty && !parsedBoxes.contains(cleanBox)) {
-          parsedBoxes.add(cleanBox);
-        }
-      }
-    }
 
     if (team != null) {
       id = team['id']?.toString() ?? '';
@@ -65,8 +45,6 @@ class TimelineItem {
           if (fullName.isNotEmpty) {
             parsedParticipants.add(fullName);
           }
-          // Parse Box
-          parseBox(m['box']);
         }
       }
     } else if (athlete != null) {
@@ -77,9 +55,6 @@ class TimelineItem {
       name = '$firstName $lastName'.trim();
       if (name.isEmpty) name = 'Unknown Athlete';
       parsedParticipants.add(name);
-      
-      // Parse Box
-      parseBox(athlete['box']);
     }
 
     return TimelineItem(
@@ -93,7 +68,6 @@ class TimelineItem {
       category: json['category'] ?? '',
       date: json['date'] ?? '',
       participants: parsedParticipants,
-      boxes: parsedBoxes,
     );
   }
 
