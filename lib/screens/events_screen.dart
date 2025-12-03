@@ -3,14 +3,27 @@ import 'package:provider/provider.dart';
 import '../providers/app_provider.dart';
 import 'timeline_screen.dart';
 
-class EventsScreen extends StatelessWidget {
+class EventsScreen extends StatefulWidget {
   const EventsScreen({super.key});
+
+  @override
+  State<EventsScreen> createState() => _EventsScreenState();
+}
+
+class _EventsScreenState extends State<EventsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<AppProvider>(context, listen: false).fetchEvents();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('JudgeRules (v2)'),
+        title: const Text('Home'),
       ),
       body: Consumer<AppProvider>(
         builder: (context, provider, child) {

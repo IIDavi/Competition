@@ -28,14 +28,22 @@ class ApiService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        return data.map((e) {
+        print('Fetched ${data.length} raw events');
+        
+        final List<Event> events = data.map((e) {
           try {
             return Event.fromJson(e);
           } catch (err) {
-            print('Error parsing event: $err');
+            print('Error parsing event ${e['id']}: $err');
             return null;
           }
         }).whereType<Event>().toList();
+        
+        if (data.isNotEmpty && events.isEmpty) {
+          throw Exception('Failed to parse any of the ${data.length} events received.');
+        }
+        
+        return events;
       } else {
         throw Exception('Failed to load events: ${response.statusCode}');
       }
