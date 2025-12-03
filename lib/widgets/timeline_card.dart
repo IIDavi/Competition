@@ -120,27 +120,6 @@ class TimelineCard extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 4),
-              // Category Badge
-              if (item.category.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 4.0),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: _getCategoryColor(item.category),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      item.category,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: _getCategoryTextColor(item.category),
-                      ),
-                    ),
-                  ),
-                ),
               Text(
                 item.teamName,
                 style: TextStyle(
@@ -150,6 +129,28 @@ class TimelineCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
+              if (item.category.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: _getCategoryColor(item.category),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        item.category,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: _getCategoryTextColor(item.category),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
               Text(
                 item.workoutName,
                 style: const TextStyle(fontStyle: FontStyle.italic, color: Colors.grey),
