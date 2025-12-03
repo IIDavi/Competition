@@ -9,6 +9,7 @@ class AppProvider with ChangeNotifier {
   
   List<Event> _events = [];
   bool _isLoadingEvents = false;
+  String? _errorMessage;
   
   Event? _selectedEvent;
   List<TimelineItem> _timeline = [];
@@ -20,6 +21,7 @@ class AppProvider with ChangeNotifier {
   // Getters
   List<Event> get events => _events;
   bool get isLoadingEvents => _isLoadingEvents;
+  String? get errorMessage => _errorMessage;
   Event? get selectedEvent => _selectedEvent;
   List<TimelineItem> get timeline => _timeline;
   bool get isLoadingTimeline => _isLoadingTimeline;
@@ -63,11 +65,13 @@ class AppProvider with ChangeNotifier {
 
   Future<void> fetchEvents() async {
     _isLoadingEvents = true;
+    _errorMessage = null;
     notifyListeners();
     try {
       _events = await _apiService.fetchEvents();
     } catch (e) {
-      print(e);
+      print('Error fetching events: $e');
+      _errorMessage = e.toString();
       _events = [];
     } finally {
       _isLoadingEvents = false;
@@ -92,6 +96,27 @@ class AppProvider with ChangeNotifier {
       _isLoadingTimeline = false;
       notifyListeners();
     }
+  }
+
+  Future<void> loadDemoEvent() async {
+    // Manually load South Throwdown (ID 1022) as requested
+    final demoEvent = Event(
+      id: '1022',
+      name: 'South Throwdown',
+      date: 'December 06/07 2025',
+      locationCity: 'Napoli',
+      locationRegion: 'Campania',
+      state: 50,
+      type: 'team',
+      totalSubscribers: 0,
+      individualsSubscribed: 0,
+      teamsSubscribed: 0,
+      enrollmentEndDate: '',
+      enrollmentEndDays: 0,
+      imgURL: '',
+      imgThumbnail: '',
+    );
+    await selectEvent(demoEvent);
   }
 
   void toggleTeamFollow(String teamId) {
