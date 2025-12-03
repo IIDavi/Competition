@@ -97,48 +97,29 @@ class Event {
       } catch (_) {}
     }
     
-    // Construct full image URL if relative
-    String img = json['image']?.toString() ?? '';
-    if (img.isNotEmpty && !img.startsWith('http')) {
-      img = 'https://competitioncorner.net/$img'; // Assuming base URL, check this
+    // Construct full image URL
+    // The API returns a relative path like "Events/..." which needs to be served via the file handler
+    String _buildCcUrl(String? path) {
+      if (path == null || path.isEmpty) return '';
+      if (path.startsWith('http')) return path;
+      return 'https://competitioncorner.net/file.aspx/mainFilesystem?$path';
     }
-    // API returns full URL usually? "Events/..." -> likely needs base.
-    // The example in reasoning said "Events/jzf51uxp7.jpg". 
-    // It's likely relative to https://competitioncorner.net/file.aspx/ or something.
-    // Let's assume for now it needs a prefix if it doesn't have http.
-    // Checking the user's provided JSON structure, it just says "Events/...". 
-    // I'll assume https://competitioncorner.net/api2/v1/events/... or similar?
-    // Actually, typically it's https://s3.amazonaws.com/competitioncorner or similar.
-    // But let's look at the fetched JSON again.
-    // Ah, I don't see the full URL in the snippet.
-    // I'll add a safe check.
-    
-    // Correction: Competition Corner images often need a base. 
-    // Let's use a placeholder if unsure, or try to construct it.
-    // "Events/..." usually maps to https://competitioncorner.net/events/... or CDN.
-    // I will use "https://competitioncorner.net/file.aspx/" as a guess or just leave it as is if it's broken.
-    // Better yet, I'll just map it and if it breaks, the UI has an error builder.
-    
-    // Actually, looking at the response: `image` "Events/jzf51uxp7.jpg". 
-    // Let's prefix with `https://competitioncorner.net/` just in case, but usually these might be CDN.
-    // Let's try `https://cdn.competitioncorner.net/` or similar? 
-    // Safe bet: `https://competitioncorner.net/` + path if not http.
 
     return Event(
       id: json['id'].toString(),
       name: json['name']?.toString() ?? 'Unknown Event',
       date: dateStr,
       locationCity: city,
-      locationRegion: country, // Using country as region
-      state: (json['active'] == true) ? 1 : 0, // Map active to state 1
+      locationRegion: country, 
+      state: (json['active'] == true) ? 1 : 0, 
       type: json['type']?.toString() ?? 'competition',
-      totalSubscribers: 0, // Not available
+      totalSubscribers: 0,
       individualsSubscribed: 0,
       teamsSubscribed: 0,
       enrollmentEndDate: json['registrationEnd']?.toString() ?? '',
       enrollmentEndDays: daysRemaining,
-      imgURL: json['image'] != null ? 'https://competitioncorner.net/file.aspx/${json['image']}' : '', // Educated guess for image URL
-      imgThumbnail: json['thumbnail'] != null ? 'https://competitioncorner.net/file.aspx/${json['thumbnail']}' : '',
+      imgURL: _buildCcUrl(json['image']?.toString()),
+      imgThumbnail: _buildCcUrl(json['thumbnail']?.toString()),
     );
   }
 }
