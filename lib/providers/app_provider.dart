@@ -98,6 +98,18 @@ class AppProvider with ChangeNotifier {
     }
   }
 
+  Future<void> loadDemoEvent() async {
+    // Manually load South Throwdown (ID 1022) as requested
+    final demoEvent = Event(
+      id: '1022',
+      name: 'South Throwdown',
+      date: 'December 06/07 2025',
+      locationCity: 'Napoli',
+      state: 50,
+    );
+    await selectEvent(demoEvent);
+  }
+
   void toggleTeamFollow(String teamId) {
     if (_followedTeamIds.contains(teamId)) {
       _followedTeamIds.remove(teamId);

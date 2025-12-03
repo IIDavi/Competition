@@ -40,12 +40,46 @@ class EventsScreen extends StatelessWidget {
                         },
                         child: const Text('Retry'),
                       ),
+                      const SizedBox(height: 16),
+                      OutlinedButton.icon(
+                        icon: const Icon(Icons.star),
+                        label: const Text('Load South Throwdown (Demo)'),
+                        onPressed: () {
+                          final provider = Provider.of<AppProvider>(context, listen: false);
+                          provider.loadDemoEvent().then((_) {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const TimelineScreen()),
+                            );
+                          });
+                        },
+                      ),
                     ],
                   ),
                 ),
               );
             }
-            return const Center(child: Text('No events found.'));
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('No events found.'),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                       final provider = Provider.of<AppProvider>(context, listen: false);
+                       provider.loadDemoEvent().then((_) {
+                         Navigator.push(
+                           context,
+                           MaterialPageRoute(builder: (context) => const TimelineScreen()),
+                         );
+                       });
+                    },
+                    child: const Text('Load South Throwdown (Demo)'),
+                  ),
+                ],
+              ),
+            );
           }
 
           return ListView.builder(
