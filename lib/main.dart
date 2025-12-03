@@ -23,13 +23,24 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'JudgeRules Tracker',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        useMaterial3: true,
-      ),
-      home: const EventsScreen(),
+    return Consumer<AppProvider>(
+      builder: (context, provider, child) {
+        return MaterialApp(
+          title: 'JudgeRules Tracker',
+          themeMode: provider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+            useMaterial3: true,
+            brightness: Brightness.light,
+          ),
+          darkTheme: ThemeData(
+            primarySwatch: Colors.blue,
+            useMaterial3: true,
+            brightness: Brightness.dark,
+          ),
+          home: const EventsScreen(),
+        );
+      },
     );
   }
 }

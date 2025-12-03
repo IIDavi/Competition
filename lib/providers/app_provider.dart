@@ -15,6 +15,9 @@ class AppProvider with ChangeNotifier {
   List<TimelineItem> _timeline = [];
   bool _isLoadingTimeline = false;
   
+  // Theme mode
+  bool _isDarkMode = false;
+  
   // Set of team IDs user wants to track
   Set<String> _followedTeamIds = {};
   
@@ -25,6 +28,7 @@ class AppProvider with ChangeNotifier {
   Event? get selectedEvent => _selectedEvent;
   List<TimelineItem> get timeline => _timeline;
   bool get isLoadingTimeline => _isLoadingTimeline;
+  bool get isDarkMode => _isDarkMode;
   Set<String> get followedTeamIds => _followedTeamIds;
 
   // Derived: Get filtered timeline for followed teams
@@ -52,16 +56,27 @@ class AppProvider with ChangeNotifier {
 
   Future<void> _loadPreferences() async {
     final prefs = await SharedPreferences.getInstance();
+    
+    // Load Theme
+    _isDarkMode = prefs.getBool('isDarkMode') ?? false;
+
     final List<String>? savedTeams = prefs.getStringList('followedTeams');
     if (savedTeams != null) {
       _followedTeamIds = savedTeams.toSet();
-      notifyListeners();
     }
+    notifyListeners();
   }
 
   Future<void> _savePreferences() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setStringList('followedTeams', _followedTeamIds.toList());
+    await prefs.setBool('isDarkMode', _isDarkMode);
+  }
+
+  void toggleTheme() {
+    _isDarkMode = !_isDarkMode;
+    _savePreferences();
+    notifyListeners();
   }
 
   Future<void> fetchEvents() async {
