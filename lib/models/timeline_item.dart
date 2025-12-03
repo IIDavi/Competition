@@ -8,6 +8,7 @@ class TimelineItem {
   final String startingTime;
   final String category;
   final String date; // "06-12-2025"
+  final List<String> participants;
 
   TimelineItem({
     required this.teamId,
@@ -19,6 +20,7 @@ class TimelineItem {
     required this.startingTime,
     required this.category,
     required this.date,
+    required this.participants,
   });
 
   factory TimelineItem.fromJson(Map<String, dynamic> json) {
@@ -27,10 +29,24 @@ class TimelineItem {
 
     String id = '';
     String name = 'Unknown';
+    List<String> parsedParticipants = [];
 
     if (team != null) {
       id = team['id']?.toString() ?? '';
       name = team['name'] ?? 'Unknown Team';
+      
+      // Try to parse members
+      final members = team['members'] ?? team['athletes'];
+      if (members is List) {
+        for (var m in members) {
+          final f = m['firstName'] ?? '';
+          final l = m['lastName'] ?? '';
+          final fullName = '$f $l'.trim();
+          if (fullName.isNotEmpty) {
+            parsedParticipants.add(fullName);
+          }
+        }
+      }
     } else if (athlete != null) {
       // Fallback for individual events
       id = athlete['id']?.toString() ?? '';
@@ -38,6 +54,7 @@ class TimelineItem {
       final lastName = athlete['lastName'] ?? '';
       name = '$firstName $lastName'.trim();
       if (name.isEmpty) name = 'Unknown Athlete';
+      parsedParticipants.add(name);
     }
 
     return TimelineItem(
@@ -50,6 +67,7 @@ class TimelineItem {
       startingTime: json['startingTime'] ?? '',
       category: json['category'] ?? '',
       date: json['date'] ?? '',
+      participants: parsedParticipants,
     );
   }
 

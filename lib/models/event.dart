@@ -59,4 +59,67 @@ class Event {
       imgThumbnail: json['imgThumbnail']?.toString() ?? '',
     );
   }
+
+  factory Event.fromCompetitionCornerJson(Map<String, dynamic> json) {
+    String? city;
+    String? country;
+    
+    final loc = json['eventLocation'];
+    if (loc is Map) {
+      city = loc['city']?.toString();
+      country = loc['country']?.toString();
+    }
+
+    // Parse dates
+    String dateStr = '';
+    if (json['startDateTime'] != null) {
+       try {
+         final start = DateTime.parse(json['startDateTime']);
+         final end = json['endDateTime'] != null ? DateTime.parse(json['endDateTime']) : null;
+         // Simple formatting: "YYYY-MM-DD"
+         dateStr = "${start.toLocal()}".split(' ')[0]; 
+         if (end != null && end.day != start.day) {
+            dateStr += " / ${"${end.toLocal()}".split(' ')[0]}";
+         }
+       } catch (e) {
+         dateStr = json['startDateTime'].toString();
+       }
+    }
+
+    // Calculate days remaining
+    int daysRemaining = 0;
+    if (json['registrationEnd'] != null) {
+      try {
+        final end = DateTime.parse(json['registrationEnd']);
+        final now = DateTime.now();
+        daysRemaining = end.difference(now).inDays;
+        if (daysRemaining < 0) daysRemaining = 0;
+      } catch (_) {}
+    }
+    
+    // Construct full image URL
+    // The API returns a relative path like "Events/..." which needs to be served via the file handler
+    String _buildCcUrl(String? path) {
+      if (path == null || path.isEmpty) return '';
+      if (path.startsWith('http')) return path;
+      return 'https://competitioncorner.net/file.aspx/mainFilesystem?$path';
+    }
+
+    return Event(
+      id: json['id'].toString(),
+      name: json['name']?.toString() ?? 'Unknown Event',
+      date: dateStr,
+      locationCity: city,
+      locationRegion: country, 
+      state: (json['active'] == true) ? 1 : 0, 
+      type: json['type']?.toString() ?? 'competition',
+      totalSubscribers: 0,
+      individualsSubscribed: 0,
+      teamsSubscribed: 0,
+      enrollmentEndDate: json['registrationEnd']?.toString() ?? '',
+      enrollmentEndDays: daysRemaining,
+      imgURL: _buildCcUrl(json['image']?.toString()),
+      imgThumbnail: _buildCcUrl(json['thumbnail']?.toString()),
+    );
+  }
 }
