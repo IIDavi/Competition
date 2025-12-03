@@ -10,10 +10,21 @@ class ApiService {
     // Using the parameters requested: limit=20, skip=0, list=1
     final uri = Uri.parse('$_baseUrl/events?limit=20&skip=0&list=1');
     try {
-      final response = await http.get(uri);
+      final response = await http.get(uri, headers: {
+        'User-Agent': 'JudgeRulesApp/1.0',
+        'Accept': 'application/json',
+      });
+
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        return data.map((e) => Event.fromJson(e)).toList();
+        return data.map((e) {
+          try {
+            return Event.fromJson(e);
+          } catch (err) {
+            print('Error parsing event: $err');
+            return null;
+          }
+        }).whereType<Event>().toList();
       } else {
         throw Exception('Failed to load events: ${response.statusCode}');
       }

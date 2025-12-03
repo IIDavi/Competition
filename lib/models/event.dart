@@ -32,21 +32,31 @@ class Event {
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
+    String? city;
+    String? region;
+    
+    // Handle location safely (it might be null, a Map, or even an empty List in some PHP APIs)
+    final loc = json['location'];
+    if (loc is Map) {
+      city = loc['city']?.toString();
+      region = loc['region']?.toString();
+    }
+
     return Event(
       id: json['id'].toString(),
-      name: json['name'] ?? 'Unknown Event',
-      date: json['date'] ?? '',
-      locationCity: json['location']?['city'],
-      locationRegion: json['location']?['region'],
-      state: json['state'] is int ? json['state'] : int.tryParse(json['state'].toString()) ?? 0,
-      type: json['type'] ?? '',
-      totalSubscribers: json['totalSubscribers'] is int ? json['totalSubscribers'] : int.tryParse(json['totalSubscribers'].toString()) ?? 0,
-      individualsSubscribed: json['individualsSubscribed'] is int ? json['individualsSubscribed'] : int.tryParse(json['individualsSubscribed'].toString()) ?? 0,
-      teamsSubscribed: json['teamsSubscribed'] is int ? json['teamsSubscribed'] : int.tryParse(json['teamsSubscribed'].toString()) ?? 0,
-      enrollmentEndDate: json['enrollmentEndDate'] ?? '',
-      enrollmentEndDays: json['enrollmentEndDays'] is int ? json['enrollmentEndDays'] : int.tryParse(json['enrollmentEndDays'].toString()) ?? 0,
-      imgURL: json['imgURL'] ?? '',
-      imgThumbnail: json['imgThumbnail'] ?? '',
+      name: json['name']?.toString() ?? 'Unknown Event',
+      date: json['date']?.toString() ?? '',
+      locationCity: city,
+      locationRegion: region,
+      state: int.tryParse(json['state'].toString()) ?? 0,
+      type: json['type']?.toString() ?? '',
+      totalSubscribers: int.tryParse(json['totalSubscribers'].toString()) ?? 0,
+      individualsSubscribed: int.tryParse(json['individualsSubscribed'].toString()) ?? 0,
+      teamsSubscribed: int.tryParse(json['teamsSubscribed'].toString()) ?? 0,
+      enrollmentEndDate: json['enrollmentEndDate']?.toString() ?? '',
+      enrollmentEndDays: int.tryParse(json['enrollmentEndDays'].toString()) ?? 0,
+      imgURL: json['imgURL']?.toString() ?? '',
+      imgThumbnail: json['imgThumbnail']?.toString() ?? '',
     );
   }
 }

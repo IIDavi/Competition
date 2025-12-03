@@ -10,7 +10,7 @@ class EventsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('JudgeRules Competitions'),
+        title: const Text('JudgeRules (v2)'),
       ),
       body: Consumer<AppProvider>(
         builder: (context, provider, child) {
@@ -18,29 +18,46 @@ class EventsScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           
-          if (provider.events.isEmpty) {
-            if (provider.errorMessage != null) {
-              return Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+          if (provider.errorMessage != null) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(Icons.error_outline, size: 48, color: Colors.red),
                       const SizedBox(height: 16),
                       Text(
-                        'Error loading events:\n${provider.errorMessage}',
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.red),
+                        'Unable to load competitions.',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                      const SizedBox(height: 8),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.grey[400]!),
+                        ),
+                        child: Text(
+                          provider.errorMessage!,
+                          style: const TextStyle(fontFamily: 'monospace', fontSize: 12),
+                        ),
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton(
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Retry Connection'),
                         onPressed: () {
                           Provider.of<AppProvider>(context, listen: false).fetchEvents();
                         },
-                        child: const Text('Retry'),
                       ),
+                      const SizedBox(height: 24),
+                      const Divider(),
                       const SizedBox(height: 16),
+                      const Text("Or continue with demo data:"),
+                      const SizedBox(height: 8),
                       OutlinedButton.icon(
                         icon: const Icon(Icons.star),
                         label: const Text('Load South Throwdown (Demo)'),
@@ -57,8 +74,11 @@ class EventsScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-              );
-            }
+              ),
+            );
+          }
+
+          if (provider.events.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

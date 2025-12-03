@@ -45,6 +45,7 @@ class AppProvider with ChangeNotifier {
   }
 
   AppProvider() {
+    print('AppProvider initialized (Safe Mode)');
     _loadPreferences();
     fetchEvents();
   }
