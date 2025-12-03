@@ -90,8 +90,10 @@ class _TimelineScreenState extends State<TimelineScreen> {
           // 2. Apply Text Search Filter
           if (_searchQuery.isNotEmpty) {
             currentList = currentList.where((item) {
-              return item.teamName.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                     item.participants.any((p) => p.toLowerCase().contains(_searchQuery.toLowerCase()));
+              final query = _searchQuery.toLowerCase();
+              return item.teamName.toLowerCase().contains(query) ||
+                     item.participants.any((p) => p.toLowerCase().contains(query)) ||
+                     item.boxes.any((b) => b.toLowerCase().contains(query));
             }).toList();
           }
 
@@ -222,7 +224,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Cerca squadra o atleta...',
+          hintText: 'Cerca squadra, atleta o box...',
           prefixIcon: const Icon(Icons.search),
           filled: true,
           fillColor: Colors.grey.shade100,
