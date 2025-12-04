@@ -6,7 +6,7 @@ import '../models/timeline_item.dart';
 class ApiService {
   static const String _baseUrl = 'https://api.judgerules.it/api';
   static const String _ccUrl = 'https://competitioncorner.net/api2/v1/events/filtered?timing=active&timestamp=1764794437313&page=1&perPage=1000';
-  static const String _circle21Url = 'https://api.circle21.events/api/competition?page=1&per_page=100';
+  static const String _circle21Url = 'https://api.circle21.events/api/competition?page=1&per_page=100&public=1&published=1';
 
   Future<List<Event>> fetchEvents() async {
     List<Event> allEvents = [];

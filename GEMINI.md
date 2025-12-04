@@ -24,6 +24,7 @@
 ## Changelog
 
 ### Recent Updates
+- **Circle21 Update**: Corrected the API endpoint to include public and published filters (`https://api.circle21.events/api/competition?page=1&per_page=100&public=1&published=1`).
 - **Event Filtering**: Added filter chips on the Home Screen to show events from specific sources ("All", "JudgeRules", "Competition Corner", "Circle21").
 - **Circle21 Integration**: Added a third event source (`https://api.circle21.events/api/competition`).
   - Events are now fetched and displayed alongside JudgeRules and Competition Corner events.
