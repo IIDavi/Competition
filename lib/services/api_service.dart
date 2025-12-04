@@ -67,7 +67,15 @@ class ApiService {
     return allEvents;
   }
 
-  Future<List<TimelineItem>> fetchTimeline(String eventId) async {
+  Future<List<TimelineItem>> fetchTimeline(Event event) async {
+    if (event.source == 'competitioncorner') {
+      return _fetchCompetitionCornerTimeline(event.id);
+    } else {
+      return _fetchJudgeRulesTimeline(event.id);
+    }
+  }
+
+  Future<List<TimelineItem>> _fetchJudgeRulesTimeline(String eventId) async {
     final uri = Uri.parse('$_baseUrl/events/$eventId/timeline');
     try {
       final response = await http.get(uri);
@@ -75,12 +83,87 @@ class ApiService {
         final List<dynamic> data = json.decode(response.body);
         return data.map((e) => TimelineItem.fromJson(e)).toList();
       } else {
-        // Sometimes 404 or empty list means not available
         return [];
       }
     } catch (e) {
-      // Treat errors as empty timeline
       return [];
     }
+  }
+
+  Future<List<TimelineItem>> _fetchCompetitionCornerTimeline(String eventId) async {
+    List<TimelineItem> timeline = [];
+    try {
+      // 1. Fetch Workouts
+      final workoutsUri = Uri.parse('https://competitioncorner.net/api2/v1/schedule/events/$eventId/workouts');
+      final workoutsResponse = await http.get(workoutsUri);
+      
+      if (workoutsResponse.statusCode != 200) return [];
+      
+      final workoutsData = json.decode(workoutsResponse.body);
+      final List<dynamic> workouts = workoutsData['workouts'] ?? [];
+      
+      // 2. Fetch Heats for each Workout
+      for (var w in workouts) {
+        final int workoutId = w['id'];
+        final String workoutName = w['name'] ?? 'Unknown Workout';
+        final String workoutDateStr = w['date'] ?? '';
+        
+        // Format date to DD-MM-YYYY if possible to match TimelineItem expectation
+        String formattedDate = workoutDateStr;
+        try {
+           final d = DateTime.parse(workoutDateStr);
+           formattedDate = "${d.day.toString().padLeft(2, '0')}-${d.month.toString().padLeft(2, '0')}-${d.year}";
+        } catch (_) {}
+
+        final heatsUri = Uri.parse('https://competitioncorner.net/api2/v1/schedule/workout/$workoutId?divisionId=all');
+        final heatsResponse = await http.get(heatsUri);
+        
+        if (heatsResponse.statusCode == 200) {
+           final List<dynamic> heats = json.decode(heatsResponse.body);
+           
+           for (var h in heats) {
+             final String heatTitle = h['title'] ?? 'Heat';
+             final String heatTime = h['time'] ?? '';
+             final String warmupTime = h['warmupTime'] ?? '';
+             
+             final List<dynamic> stations = h['stations'] ?? [];
+             for (var s in stations) {
+               // Parse teammates
+               List<String> participants = [];
+               final String teammatesStr = s['teammates'] ?? '';
+               if (teammatesStr.isNotEmpty) {
+                 // Remove "(C)" leader marker and split
+                 participants = teammatesStr
+                     .replaceAll('(C) ', '')
+                     .split(',')
+                     .map((e) => e.trim())
+                     .where((e) => e.isNotEmpty)
+                     .toList();
+               }
+
+               timeline.add(TimelineItem(
+                 teamId: s['participantId']?.toString() ?? '',
+                 teamName: s['participantName'] ?? 'Unknown Team',
+                 workoutName: workoutName,
+                 heat: heatTitle,
+                 lane: s['station']?.toString() ?? '',
+                 warmupTime: warmupTime,
+                 startingTime: heatTime,
+                 category: s['division'] ?? '',
+                 date: formattedDate,
+                 participants: participants,
+               ));
+             }
+           }
+        }
+      }
+      
+      // Sort by date and time is implicitly handled if the list order is preserved or we can sort it.
+      // Usually API returns in order, but TimelineScreen logic handles simple grouping.
+      
+    } catch (e) {
+      print('Error fetching CC timeline: $e');
+    }
+    return timeline;
   }
 }

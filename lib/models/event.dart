@@ -13,6 +13,7 @@ class Event {
   final int enrollmentEndDays;
   final String imgURL;
   final String imgThumbnail;
+  final String source;
 
   Event({
     required this.id,
@@ -29,6 +30,7 @@ class Event {
     required this.enrollmentEndDays,
     required this.imgURL,
     required this.imgThumbnail,
+    this.source = 'judgerules',
   });
 
   factory Event.fromJson(Map<String, dynamic> json) {
@@ -57,6 +59,7 @@ class Event {
       enrollmentEndDays: int.tryParse(json['enrollmentEndDays'].toString()) ?? 0,
       imgURL: json['imgURL']?.toString() ?? '',
       imgThumbnail: json['imgThumbnail']?.toString() ?? '',
+      source: 'judgerules',
     );
   }
 
@@ -120,6 +123,7 @@ class Event {
       enrollmentEndDays: daysRemaining,
       imgURL: _buildCcUrl(json['image']?.toString()),
       imgThumbnail: _buildCcUrl(json['thumbnail']?.toString()),
+      source: 'competitioncorner',
     );
   }
 }

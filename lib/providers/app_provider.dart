@@ -98,14 +98,14 @@ class AppProvider with ChangeNotifier {
   Future<void> selectEvent(Event event) async {
     _selectedEvent = event;
     _timeline = []; // Clear previous
-    await fetchTimeline(event.id);
+    await fetchTimeline(event);
   }
 
-  Future<void> fetchTimeline(String eventId) async {
+  Future<void> fetchTimeline(Event event) async {
     _isLoadingTimeline = true;
     notifyListeners();
     try {
-      _timeline = await _apiService.fetchTimeline(eventId);
+      _timeline = await _apiService.fetchTimeline(event);
     } catch (e) {
       _timeline = [];
     } finally {
