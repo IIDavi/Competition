@@ -14,6 +14,7 @@
   - Material Design with Dark/Light mode support
   - English Localization
   - Responsive Timeline view
+  - **Source Filtering**: Filter events by platform (JudgeRules, Competition Corner, Circle21)
 - **Functionality**:
   - Event listing (Unified from 3 sources)
   - Detailed schedule/timeline for selected events (JudgeRules & Competition Corner)
@@ -23,6 +24,7 @@
 ## Changelog
 
 ### Recent Updates
+- **Event Filtering**: Added filter chips on the Home Screen to show events from specific sources ("All", "JudgeRules", "Competition Corner", "Circle21").
 - **Circle21 Integration**: Added a third event source (`https://api.circle21.events/api/competition`).
   - Events are now fetched and displayed alongside JudgeRules and Competition Corner events.
   - Data mapping implemented for the specific JSON structure of Circle21.

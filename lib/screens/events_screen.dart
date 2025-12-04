@@ -13,6 +13,7 @@ class EventsScreen extends StatefulWidget {
 class _EventsScreenState extends State<EventsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  String? _selectedSource;
 
   @override
   void dispose() {
@@ -106,7 +107,9 @@ class _EventsScreenState extends State<EventsScreen> {
           }
 
           final filteredEvents = provider.events.where((event) {
-            return event.name.toLowerCase().contains(_searchQuery.toLowerCase());
+            final matchesSearch = event.name.toLowerCase().contains(_searchQuery.toLowerCase());
+            final matchesSource = _selectedSource == null || event.source == _selectedSource;
+            return matchesSearch && matchesSource;
           }).toList();
 
           return Column(
@@ -125,6 +128,53 @@ class _EventsScreenState extends State<EventsScreen> {
                       _searchQuery = value;
                     });
                   },
+                ),
+              ),
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  children: [
+                    ChoiceChip(
+                      label: const Text('All'),
+                      selected: _selectedSource == null,
+                      onSelected: (bool selected) {
+                        setState(() {
+                          _selectedSource = null;
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text('JudgeRules'),
+                      selected: _selectedSource == 'judgerules',
+                      onSelected: (bool selected) {
+                        setState(() {
+                          _selectedSource = selected ? 'judgerules' : null;
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text('Competition Corner'),
+                      selected: _selectedSource == 'competitioncorner',
+                      onSelected: (bool selected) {
+                        setState(() {
+                          _selectedSource = selected ? 'competitioncorner' : null;
+                        });
+                      },
+                    ),
+                    const SizedBox(width: 8),
+                    ChoiceChip(
+                      label: const Text('Circle21'),
+                      selected: _selectedSource == 'circle21',
+                      onSelected: (bool selected) {
+                        setState(() {
+                          _selectedSource = selected ? 'circle21' : null;
+                        });
+                      },
+                    ),
+                  ],
                 ),
               ),
               Expanded(
