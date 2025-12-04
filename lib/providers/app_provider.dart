@@ -84,7 +84,9 @@ class AppProvider with ChangeNotifier {
     _errorMessage = null;
     notifyListeners();
     try {
-      _events = await _apiService.fetchEvents();
+      final fetchedEvents = await _apiService.fetchEvents();
+      _events = fetchedEvents;
+      
     } catch (e) {
       print('Error fetching events: $e');
       _errorMessage = e.toString();
@@ -98,14 +100,14 @@ class AppProvider with ChangeNotifier {
   Future<void> selectEvent(Event event) async {
     _selectedEvent = event;
     _timeline = []; // Clear previous
-    await fetchTimeline(event.id);
+    await fetchTimeline(event);
   }
 
-  Future<void> fetchTimeline(String eventId) async {
+  Future<void> fetchTimeline(Event event) async {
     _isLoadingTimeline = true;
     notifyListeners();
     try {
-      _timeline = await _apiService.fetchTimeline(eventId);
+      _timeline = await _apiService.fetchTimeline(event);
     } catch (e) {
       _timeline = [];
     } finally {

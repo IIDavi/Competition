@@ -35,7 +35,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
         actions: [
           // Toggle "My Teams" view
           IconButton(
-            tooltip: _showMyTeamsOnly ? 'Mostra tutto' : 'Mostra le tue squadre',
+            tooltip: _showMyTeamsOnly ? 'Show all' : 'Show my teams',
             icon: Icon(
               _showMyTeamsOnly ? Icons.filter_alt : Icons.filter_alt_off,
               color: _showMyTeamsOnly ? Colors.blue : null,
@@ -48,14 +48,14 @@ class _TimelineScreenState extends State<TimelineScreen> {
               if (_showMyTeamsOnly) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Visualizzazione: Le tue squadre'),
+                    content: Text('View: Your teams'),
                     duration: Duration(seconds: 1),
                   ),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
-                    content: Text('Visualizzazione: Tutti gli eventi'),
+                    content: Text('View: All events'),
                     duration: Duration(seconds: 1),
                   ),
                 );
@@ -64,7 +64,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
           ),
           // Manage "My Teams"
           IconButton(
-            tooltip: 'Gestisci le tue squadre',
+            tooltip: 'Manage your teams',
             icon: const Icon(Icons.groups),
             onPressed: () {
               showModalBottomSheet(
@@ -113,8 +113,8 @@ class _TimelineScreenState extends State<TimelineScreen> {
                         const SizedBox(height: 16),
                         Text(
                           _showMyTeamsOnly && provider.followedTeamIds.isEmpty
-                              ? 'Non segui ancora nessuna squadra.\nClicca sull\'icona "Gestisci le tue squadre" in alto.'
-                              : 'Nessun risultato trovato.',
+                              ? 'You are not following any team yet.\nClick the "Manage your teams" icon above.'
+                              : 'The timeline is not available yet.',
                           textAlign: TextAlign.center,
                           style: const TextStyle(color: Colors.grey),
                         ),
@@ -135,7 +135,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
                   color: Colors.blue.shade50,
                   padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                   child: Text(
-                    'Filtro attivo: Le tue squadre (${provider.followedTeamIds.length})',
+                    'Active filter: Your teams (${provider.followedTeamIds.length})',
                     style: TextStyle(color: Colors.blue.shade900, fontSize: 12),
                   ),
                 ),
@@ -223,10 +223,12 @@ class _TimelineScreenState extends State<TimelineScreen> {
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
-          hintText: 'Cerca squadra o atleta...',
+          hintText: 'Search team or athlete...',
           prefixIcon: const Icon(Icons.search),
           filled: true,
-          fillColor: Colors.grey.shade100,
+          fillColor: Theme.of(context).brightness == Brightness.dark 
+              ? Colors.grey.shade800 
+              : Colors.grey.shade100,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
             borderSide: BorderSide.none,
