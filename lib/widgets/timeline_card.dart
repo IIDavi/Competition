@@ -103,7 +103,7 @@ class TimelineCard extends StatelessWidget {
                       const SizedBox(width: 8),
                       Text(
                         '(Warmup: ${item.warmupTime})',
-                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        style: TextStyle(fontSize: 12, color: Theme.of(context).textTheme.bodySmall?.color),
                       ),
                     ],
                   ),
@@ -136,7 +136,7 @@ class TimelineCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: isHighlight ? FontWeight.bold : FontWeight.normal,
-                  color: isHighlight ? Colors.blue.shade800 : Colors.black87,
+                  color: isHighlight ? Colors.blue.shade800 : Theme.of(context).textTheme.bodyLarge?.color,
                 ),
               ),
               const SizedBox(height: 4),
