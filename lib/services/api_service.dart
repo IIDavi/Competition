@@ -6,6 +6,7 @@ import '../models/timeline_item.dart';
 class ApiService {
   static const String _baseUrl = 'https://api.judgerules.it/api';
   static const String _ccUrl = 'https://competitioncorner.net/api2/v1/events/filtered?timing=active&timestamp=1764794437313&page=1&perPage=1000';
+  static const String _circle21Url = 'https://api.circle21.events/api/competition?page=1&per_page=100';
 
   Future<List<Event>> fetchEvents() async {
     List<Event> allEvents = [];
@@ -59,8 +60,31 @@ class ApiService {
       print('Error fetching CC events: $e');
     }
 
+    // 3. Fetch from Circle21
+    try {
+      final uri = Uri.parse(_circle21Url);
+      final response = await http.get(uri);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> jsonResponse = json.decode(response.body);
+        if (jsonResponse.containsKey('data') && jsonResponse['data'] is List) {
+           final List<dynamic> data = jsonResponse['data'];
+           allEvents.addAll(data.map((e) {
+             try {
+               return Event.fromCircle21Json(e);
+             } catch (err) {
+               print('Error parsing Circle21 event: $err');
+               return null;
+             }
+           }).whereType<Event>());
+        }
+      }
+    } catch (e) {
+      print('Error fetching Circle21 events: $e');
+    }
+
     if (allEvents.isEmpty) {
-      // Only throw if BOTH failed to return any events
+      // Only throw if ALL failed to return any events
       throw Exception('Failed to load events from any source.');
     }
     
@@ -70,6 +94,8 @@ class ApiService {
   Future<List<TimelineItem>> fetchTimeline(Event event) async {
     if (event.source == 'competitioncorner') {
       return _fetchCompetitionCornerTimeline(event.id);
+    } else if (event.source == 'circle21') {
+      return []; 
     } else {
       return _fetchJudgeRulesTimeline(event.id);
     }

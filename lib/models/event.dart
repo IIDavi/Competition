@@ -126,4 +126,57 @@ class Event {
       source: 'competitioncorner',
     );
   }
+
+  factory Event.fromCircle21Json(Map<String, dynamic> json) {
+    // Parse dates
+    String dateStr = '';
+    if (json['date_from'] != null) {
+      try {
+        final start = DateTime.parse(json['date_from']);
+        final end = json['date_to'] != null ? DateTime.parse(json['date_to']) : null;
+        // Simple formatting: "YYYY-MM-DD"
+        dateStr = "${start.toLocal()}".split(' ')[0];
+        if (end != null && end.day != start.day) {
+          dateStr += " / ${"${end.toLocal()}".split(' ')[0]}";
+        }
+      } catch (e) {
+        dateStr = json['date_from'].toString();
+      }
+    }
+
+    // Calculate days remaining
+    int daysRemaining = 0;
+    if (json['registration_to'] != null) {
+      try {
+        final end = DateTime.parse(json['registration_to']);
+        final now = DateTime.now();
+        daysRemaining = end.difference(now).inDays;
+        if (daysRemaining < 0) daysRemaining = 0;
+      } catch (_) {}
+    }
+
+    String? img = json['cover']?.toString();
+    String? thumb = json['logo']?.toString();
+    // Fallback if one is missing
+    if (img == null || img.isEmpty) img = thumb;
+    if (thumb == null || thumb.isEmpty) thumb = img;
+
+    return Event(
+      id: json['id'].toString(),
+      name: json['name']?.toString() ?? 'Unknown Event',
+      date: dateStr,
+      locationCity: null, // No clear city field in top-level JSON
+      locationRegion: json['country']?.toString(),
+      state: 1, // Assume active
+      type: json['type']?.toString() ?? 'competition',
+      totalSubscribers: 0,
+      individualsSubscribed: 0,
+      teamsSubscribed: 0,
+      enrollmentEndDate: json['registration_to']?.toString() ?? '',
+      enrollmentEndDays: daysRemaining,
+      imgURL: img ?? '',
+      imgThumbnail: thumb ?? '',
+      source: 'circle21',
+    );
+  }
 }
