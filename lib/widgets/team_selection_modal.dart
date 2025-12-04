@@ -53,7 +53,7 @@ class _TeamSelectionModalState extends State<TeamSelectionModal> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    'Le tue squadre',
+                    'Your teams',
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                   ),
                   IconButton(
@@ -66,7 +66,7 @@ class _TeamSelectionModalState extends State<TeamSelectionModal> {
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  labelText: 'Cerca squadra...',
+                  labelText: 'Search team...',
                   prefixIcon: const Icon(Icons.search),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
@@ -92,7 +92,7 @@ class _TeamSelectionModalState extends State<TeamSelectionModal> {
               const SizedBox(height: 16),
               Expanded(
                 child: filteredTeams.isEmpty
-                    ? const Center(child: Text('Nessuna squadra trovata'))
+                    ? const Center(child: Text('No teams found'))
                     : ListView.builder(
                         itemCount: filteredTeams.length,
                         itemBuilder: (context, index) {

@@ -55,7 +55,7 @@ class TimelineCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Partecipanti - ${item.teamName}',
+                    'Participants - ${item.teamName}',
                     style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                   const Divider(),
@@ -76,7 +76,7 @@ class TimelineCard extends StatelessWidget {
                   else
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Text('Nessuna informazione sui partecipanti disponibile.'),
+                      child: Text('No participant information available.'),
                     ),
                   const SizedBox(height: 10),
                 ],
@@ -120,10 +120,10 @@ class TimelineCard extends StatelessWidget {
                           // For prototype: show confirmation.
                           NotificationService().showNotification(
                             'Alert Set', 
-                            'Sarai avvisato prima che ${item.teamName} inizi alle ${item.startingTime}'
+                            'You will be notified before ${item.teamName} starts at ${item.startingTime}'
                           );
                           ScaffoldMessenger.of(context).showSnackBar(
-                             const SnackBar(content: Text('Notifica programmata (demo)')),
+                             const SnackBar(content: Text('Notification scheduled (demo)')),
                           );
                         },
                       ),
