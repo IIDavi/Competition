@@ -126,40 +126,4 @@ class Event {
       source: 'competitioncorner',
     );
   }
-
-  Event copyWith({
-    String? id,
-    String? name,
-    String? date,
-    String? locationCity,
-    String? locationRegion,
-    int? state,
-    String? type,
-    int? totalSubscribers,
-    int? individualsSubscribed,
-    int? teamsSubscribed,
-    String? enrollmentEndDate,
-    int? enrollmentEndDays,
-    String? imgURL,
-    String? imgThumbnail,
-    String? source,
-  }) {
-    return Event(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      date: date ?? this.date,
-      locationCity: locationCity ?? this.locationCity,
-      locationRegion: locationRegion ?? this.locationRegion,
-      state: state ?? this.state,
-      type: type ?? this.type,
-      totalSubscribers: totalSubscribers ?? this.totalSubscribers,
-      individualsSubscribed: individualsSubscribed ?? this.individualsSubscribed,
-      teamsSubscribed: teamsSubscribed ?? this.teamsSubscribed,
-      enrollmentEndDate: enrollmentEndDate ?? this.enrollmentEndDate,
-      enrollmentEndDays: enrollmentEndDays ?? this.enrollmentEndDays,
-      imgURL: imgURL ?? this.imgURL,
-      imgThumbnail: imgThumbnail ?? this.imgThumbnail,
-      source: source ?? this.source,
-    );
-  }
 }

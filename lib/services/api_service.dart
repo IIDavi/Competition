@@ -166,44 +166,4 @@ class ApiService {
     }
     return timeline;
   }
-
-  Future<int> getCCParticipantCount(String eventId) async {
-    try {
-      // 1. Fetch Workouts
-      final workoutsUri = Uri.parse('https://competitioncorner.net/api2/v1/schedule/events/$eventId/workouts');
-      final workoutsResponse = await http.get(workoutsUri);
-      
-      if (workoutsResponse.statusCode != 200) return 0;
-      
-      final workoutsData = json.decode(workoutsResponse.body);
-      final List<dynamic> workouts = workoutsData['workouts'] ?? [];
-      if (workouts.isEmpty) return 0;
-
-      // 2. Pick first workout as a representative sample
-      final int workoutId = workouts[0]['id'];
-
-      // 3. Fetch Heats for this workout
-      final heatsUri = Uri.parse('https://competitioncorner.net/api2/v1/schedule/workout/$workoutId?divisionId=all');
-      final heatsResponse = await http.get(heatsUri);
-
-      if (heatsResponse.statusCode != 200) return 0;
-      
-      final List<dynamic> heats = json.decode(heatsResponse.body);
-      final Set<int> uniqueParticipants = {};
-
-      for (var h in heats) {
-        final List<dynamic> stations = h['stations'] ?? [];
-        for (var s in stations) {
-          if (s['participantId'] != null) {
-            uniqueParticipants.add(s['participantId']);
-          }
-        }
-      }
-      return uniqueParticipants.length;
-
-    } catch (e) {
-      print('Error counting CC participants: $e');
-      return 0;
-    }
-  }
 }

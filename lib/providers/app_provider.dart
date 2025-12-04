@@ -87,9 +87,6 @@ class AppProvider with ChangeNotifier {
       final fetchedEvents = await _apiService.fetchEvents();
       _events = fetchedEvents;
       
-      // Start background fetch for CC participant counts
-      _updateCCCounts(List.from(fetchedEvents));
-
     } catch (e) {
       print('Error fetching events: $e');
       _errorMessage = e.toString();
@@ -97,26 +94,6 @@ class AppProvider with ChangeNotifier {
     } finally {
       _isLoadingEvents = false;
       notifyListeners();
-    }
-  }
-
-  Future<void> _updateCCCounts(List<Event> eventsToCheck) async {
-    for (final event in eventsToCheck) {
-      if (event.source == 'competitioncorner') {
-        try {
-          final count = await _apiService.getCCParticipantCount(event.id);
-          if (count > 0) {
-            // Find the event in the current _events list and update it
-            final index = _events.indexWhere((e) => e.id == event.id);
-            if (index != -1) {
-              _events[index] = _events[index].copyWith(totalSubscribers: count);
-              notifyListeners();
-            }
-          }
-        } catch (e) {
-          print('Error updating count for ${event.id}: $e');
-        }
-      }
     }
   }
 
