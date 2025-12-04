@@ -14,15 +14,8 @@ class ApiService {
     // 1. Fetch from JudgeRules
     try {
       final uri = Uri.parse('$_baseUrl/events?limit=20&skip=0&list=1');
-      final response = await http.get(uri, headers: {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:140.0) Gecko/20100101 Firefox/140.0',
-        'Accept': '*/*',
-        'Accept-Language': 'en_GB',
-        'Referer': 'https://app.judgerules.it/',
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Origin': 'https://app.judgerules.it',
-        'Connection': 'keep-alive',
-      });
+      // Simplified headers to avoid WAF blocking (mimicking basic request which worked with curl)
+      final response = await http.get(uri);
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -34,6 +27,8 @@ class ApiService {
             return null;
           }
         }).whereType<Event>());
+      } else {
+        print('JR API returned status: ${response.statusCode}');
       }
     } catch (e) {
       print('Error fetching JR events: $e');
