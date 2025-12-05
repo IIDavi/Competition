@@ -14,8 +14,11 @@ class ApiService {
     // 1. Fetch from JudgeRules
     try {
       final uri = Uri.parse('$_baseUrl/events?limit=20&skip=0&list=1');
-      // Simplified headers to avoid WAF blocking (mimicking basic request which worked with curl)
-      final response = await http.get(uri);
+      // Mimic curl headers to bypass WAF/Cloudflare
+      final response = await http.get(uri, headers: {
+        'User-Agent': 'curl/7.88.1',
+        'Accept': '*/*',
+      });
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -99,7 +102,10 @@ class ApiService {
   Future<List<TimelineItem>> _fetchJudgeRulesTimeline(String eventId) async {
     final uri = Uri.parse('$_baseUrl/events/$eventId/timeline');
     try {
-      final response = await http.get(uri);
+      final response = await http.get(uri, headers: {
+        'User-Agent': 'curl/7.88.1',
+        'Accept': '*/*',
+      });
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
         return data.map((e) => TimelineItem.fromJson(e)).toList();

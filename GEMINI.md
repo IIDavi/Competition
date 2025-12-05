@@ -24,7 +24,7 @@
 ## Changelog
 
 ### Recent Updates
-- **API Fix**: Simplified HTTP headers for JudgeRules API requests to prevent potential blocking (WAF/Cloudflare) which was causing an empty event list for this source.
+- **API Fix**: Modified HTTP headers for JudgeRules API requests to mimic `curl` (`User-Agent: curl/7.88.1`, `Accept: */*`). This bypasses the WAF/Cloudflare protection that was blocking standard Dart requests.
 - **Dark Mode Fix**: Improved text visibility on the Timeline screen. Fixed hardcoded black text colors in `TimelineCard` and adjusted the Search Bar background to ensure readability in dark mode.
 - **Circle21 Update**: Corrected the API endpoint to include public and published filters (`https://api.circle21.events/api/competition?page=1&per_page=100&public=1&published=1`).
 - **Event Filtering**: Added filter chips on the Home Screen to show events from specific sources ("All", "JudgeRules", "Competition Corner", "Circle21").
