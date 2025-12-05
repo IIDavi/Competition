@@ -24,7 +24,8 @@
 ## Changelog
 
 ### Recent Updates
-- **API Fix**: Modified HTTP headers for JudgeRules API requests to mimic `curl` (`User-Agent: curl/7.88.1`, `Accept: */*`). This bypasses the WAF/Cloudflare protection that was blocking standard Dart requests.
+- **API Reliability**: Implemented a fallback mechanism for JudgeRules API. If the standard Dart HTTP client fails (due to WAF/Cloudflare blocking), the app now automatically executes the system's `curl` command to fetch data. This ensures consistent access to events and timelines on Linux systems where `curl` is available and functioning.
+- **API Fix**: Modified HTTP headers for JudgeRules API requests to mimic `curl` (`User-Agent: curl/7.88.1`, `Accept: */*`).
 - **Dark Mode Fix**: Improved text visibility on the Timeline screen. Fixed hardcoded black text colors in `TimelineCard` and adjusted the Search Bar background to ensure readability in dark mode.
 - **Circle21 Update**: Corrected the API endpoint to include public and published filters (`https://api.circle21.events/api/competition?page=1&per_page=100&public=1&published=1`).
 - **Event Filtering**: Added filter chips on the Home Screen to show events from specific sources ("All", "JudgeRules", "Competition Corner", "Circle21").

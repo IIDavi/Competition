@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/event.dart';
 import '../models/timeline_item.dart';
@@ -14,14 +15,38 @@ class ApiService {
     // 1. Fetch from JudgeRules
     try {
       final uri = Uri.parse('$_baseUrl/events?limit=20&skip=0&list=1');
-      // Mimic curl headers to bypass WAF/Cloudflare
-      final response = await http.get(uri, headers: {
-        'User-Agent': 'curl/7.88.1',
-        'Accept': '*/*',
-      });
+      
+      String responseBody = '';
+      int statusCode = 0;
 
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+      // Try standard http request first
+      try {
+        final response = await http.get(uri, headers: {
+          'User-Agent': 'curl/7.88.1',
+          'Accept': '*/*',
+        });
+        statusCode = response.statusCode;
+        responseBody = response.body;
+      } catch (e) {
+        print('Standard HTTP failed for JR: $e');
+      }
+
+      // Fallback to system curl if http fails or returns non-200 (Linux/Mac workaround)
+      if ((statusCode != 200 || responseBody.isEmpty) && !Platform.isWindows && !Platform.isAndroid && !Platform.isIOS) {
+         print('Http failed ($statusCode), trying system curl...');
+         try {
+           final result = await Process.run('curl', ['-s', '-A', 'curl/7.88.1', uri.toString()]);
+           if (result.exitCode == 0) {
+             responseBody = result.stdout.toString();
+             statusCode = 200; // Fake success
+           }
+         } catch (e) {
+           print('System curl failed: $e');
+         }
+      }
+
+      if (statusCode == 200 && responseBody.isNotEmpty) {
+        final List<dynamic> data = json.decode(responseBody);
         allEvents.addAll(data.map((e) {
           try {
             return Event.fromJson(e);
@@ -31,7 +56,7 @@ class ApiService {
           }
         }).whereType<Event>());
       } else {
-        print('JR API returned status: ${response.statusCode}');
+        print('JR API returned status: $statusCode');
       }
     } catch (e) {
       print('Error fetching JR events: $e');
@@ -102,12 +127,36 @@ class ApiService {
   Future<List<TimelineItem>> _fetchJudgeRulesTimeline(String eventId) async {
     final uri = Uri.parse('$_baseUrl/events/$eventId/timeline');
     try {
-      final response = await http.get(uri, headers: {
-        'User-Agent': 'curl/7.88.1',
-        'Accept': '*/*',
-      });
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+      String responseBody = '';
+      int statusCode = 0;
+
+      // Try standard http
+      try {
+        final response = await http.get(uri, headers: {
+          'User-Agent': 'curl/7.88.1',
+          'Accept': '*/*',
+        });
+        statusCode = response.statusCode;
+        responseBody = response.body;
+      } catch (e) {
+        print('Standard HTTP failed for Timeline: $e');
+      }
+
+      // Fallback to system curl
+      if ((statusCode != 200 || responseBody.isEmpty) && !Platform.isWindows && !Platform.isAndroid && !Platform.isIOS) {
+         try {
+           final result = await Process.run('curl', ['-s', '-A', 'curl/7.88.1', uri.toString()]);
+           if (result.exitCode == 0) {
+             responseBody = result.stdout.toString();
+             statusCode = 200;
+           }
+         } catch (e) {
+           print('System curl timeline failed: $e');
+         }
+      }
+
+      if (statusCode == 200 && responseBody.isNotEmpty) {
+        final List<dynamic> data = json.decode(responseBody);
         return data.map((e) => TimelineItem.fromJson(e)).toList();
       } else {
         return [];
