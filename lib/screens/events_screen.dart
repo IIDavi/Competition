@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import '../services/auth_service.dart';
 import '../providers/app_provider.dart';
 import 'timeline_screen.dart';
 
@@ -27,6 +29,27 @@ class _EventsScreenState extends State<EventsScreen> {
       appBar: AppBar(
         title: const Text('JudgeRules (v2)'),
         actions: [
+          Consumer<AuthService>(
+            builder: (context, auth, _) {
+              return IconButton(
+                icon: Icon(auth.isAuthenticated ? Icons.admin_panel_settings : Icons.login),
+                tooltip: auth.isAuthenticated ? 'Admin Panel' : 'Login',
+                onPressed: () {
+                  if (auth.isAuthenticated) {
+                    if (auth.isAdmin) {
+                      context.go('/admin');
+                    } else {
+                      // Already logged in but not admin? Redirect to login (or logout)
+                      // For now, let's just go to admin which handles redirect or login
+                      context.go('/admin');
+                    }
+                  } else {
+                    context.go('/login');
+                  }
+                },
+              );
+            },
+          ),
           Consumer<AppProvider>(
             builder: (context, provider, child) {
               return IconButton(
