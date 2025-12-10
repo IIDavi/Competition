@@ -24,6 +24,7 @@
 ## Changelog
 
 ### Recent Updates
+- **Revert**: Rolled back Authentication and Admin Panel features due to build/compilation issues.
 - **API Reliability**: Implemented a fallback mechanism for JudgeRules API. If the standard Dart HTTP client fails (due to WAF/Cloudflare blocking), the app now automatically executes the system's `curl` command to fetch data. This ensures consistent access to events and timelines on Linux systems where `curl` is available and functioning.
 - **API Fix**: Modified HTTP headers for JudgeRules API requests to mimic `curl` (`User-Agent: curl/7.88.1`, `Accept: */*`).
 - **Dark Mode Fix**: Improved text visibility on the Timeline screen. Fixed hardcoded black text colors in `TimelineCard` and adjusted the Search Bar background to ensure readability in dark mode.
